@@ -92,7 +92,6 @@
 </head>
 <body>
 
-<!-- Флаг -->
 <div id="langSelectorWrapper" aria-label="Language selector">
   <select id="langSelector" title="Select language / Выберите язык" aria-live="polite" aria-atomic="true">
     <option value="ru" data-flag="https://flagcdn.com/w20/ru.png">Русский</option>
@@ -175,11 +174,7 @@
 <h3 id="resultTitle">Результат JSON:</h3>
 <pre id="output"></pre>
 
-<!-- Скрипт -->
 <script>
-  // -------------------
-  // 1) Флаг + Перевод
-  // -------------------
   const langSelector = document.getElementById('langSelector');
   const wrapper = document.getElementById('langSelectorWrapper');
 
@@ -197,9 +192,6 @@
   });
   updateFlag();
 
-  // -----------------------
-  // 2) Меню + Слоты
-  // -----------------------
   let allItems = [];
   fetch('itemsList.json').then(r => r.json()).then(data => allItems = data);
 
@@ -230,8 +222,8 @@
   const saveSlotBtn = document.getElementById("saveSlot");
   const clearSlotsBtn = document.getElementById("clearSlots");
   const generateJSONBtn = document.getElementById("generateJSON");
+  const downloadJSONBtn = document.getElementById("downloadJSON");
 
-  // Новое: кнопки и селект меню
   const saveMenuBtn = document.getElementById("saveMenu");
   const newMenuBtn = document.getElementById("newMenu");
   const menusLabel = document.getElementById("labelMenusList");
@@ -262,7 +254,7 @@
       closeMenuCheckbox.checked = false;
       onOpenCommandsInput.value = "";
       onClosedCommandsInput.value = "";
-      menus[name] = { slots: {} };
+      menus[name] = { slots: [] };
       updateMenusList();
       menusList.value = name;
       renderGrid();
@@ -271,6 +263,10 @@
 
   saveMenuBtn.onclick = () => {
     if (!menuNameInput.value.trim()) return alert("Введите имя меню");
+    const slotsArray = Object.keys(slots).map(i => ({
+      index: parseInt(i),
+      ...slots[i]
+    }));
     menus[menuNameInput.value.trim()] = {
       title: menuTitleInput.value,
       lines: parseInt(menuLinesInput.value) || 3,
@@ -279,7 +275,7 @@
         on_open_commands: onOpenCommandsInput.value.split("\n").filter(x => x),
         on_closed_commands: onClosedCommandsInput.value.split("\n").filter(x => x)
       },
-      slots: slots
+      slots: slotsArray
     };
     updateMenusList();
     menusList.value = menuNameInput.value.trim();
@@ -296,13 +292,13 @@
     closeMenuCheckbox.checked = !!m.close_menu_on_clicked;
     onOpenCommandsInput.value = (m.commands?.on_open_commands || []).join("\n");
     onClosedCommandsInput.value = (m.commands?.on_closed_commands || []).join("\n");
-    slots = m.slots || {};
+    slots = {};
+    (m.slots || []).forEach(s => slots[s.index] = s);
     selectedSlot = null;
     renderGrid();
     loadSlot(null);
   };
 
-  // Автоподстановка предметов
   itemSearch.addEventListener("input", () => {
     const val = itemSearch.value.trim().toLowerCase();
     if (!val) { itemList.innerHTML = ''; return; }
@@ -406,124 +402,6 @@
   generateJSONBtn.onclick = () => {
     outputPre.textContent = JSON.stringify({ menus }, null, 2);
   };
-  menuLinesInput.onchange = () => { selectedSlot = null; loadSlot(null); renderGrid(); };
-  renderGrid();
-
-  // ---------------------------
-  // Перевод с новыми кнопками
-  // ---------------------------
-  const translations = {
-    ru: {
-      title: "Редактор меню Minecraft",
-      labelMenusList: "Меню:",
-      newMenu: "+ Новое меню",
-      saveMenu: "Сохранить меню",
-      labelMenuName: "Название меню:",
-      labelMenuTitle: "Заголовок меню:",
-      labelMenuLines: "Линии (1–6):",
-      labelCloseMenu: "Закрывать меню при клике",
-      labelOnOpenCommands: "Команды при открытии:",
-      labelOnClosedCommands: "Команды при закрытии:",
-      slotsTitle: "Слоты:",
-      slotEditorTitle: "Редактор слота",
-      labelItemSearch: "Поиск предмета:",
-      labelDisplayName: "Имя (display_name):",
-      labelItemCount: "Количество:",
-      labelItemLore: "Лор (по одной строке):",
-      labelHideTooltip: "Скрыть подсказку",
-      labelGlow: "Подсвечивать",
-      labelViewLevel: "View Requirement Level:",
-      labelViewString: "View Requirement String:",
-      labelOnLeftClick: "on_left_click_commands:",
-      labelOnLeftShiftClick: "on_left_shift_click_commands:",
-      labelOnRightClick: "on_right_click_commands:",
-      labelOnRightShiftClick: "on_right_shift_click_commands:",
-      labelOnMiddleClick: "on_middle_click_commands:",
-      saveSlot: "Сохранить слот",
-      clearSlots: "Очистить всё",
-      generateJSON: "Сгенерировать JSON",
-      resultTitle: "Результат JSON:",
-      downloadJSON: "Скачать JSON"
-    },
-    en: {
-      title: "Minecraft Menu Editor",
-      labelMenusList: "Menus:",
-      newMenu: "+ New menu",
-      saveMenu: "Save menu",
-      labelMenuName: "Menu name:",
-      labelMenuTitle: "Menu title:",
-      labelMenuLines: "Lines (1–6):",
-      labelCloseMenu: "Close menu on click",
-      labelOnOpenCommands: "Commands on open:",
-      labelOnClosedCommands: "Commands on close:",
-      slotsTitle: "Slots:",
-      slotEditorTitle: "Slot editor",
-      labelItemSearch: "Item search:",
-      labelDisplayName: "Display name:",
-      labelItemCount: "Count:",
-      labelItemLore: "Lore (one line each):",
-      labelHideTooltip: "Hide tooltip",
-      labelGlow: "Glow",
-      labelViewLevel: "View Requirement Level:",
-      labelViewString: "View Requirement String:",
-      labelOnLeftClick: "on_left_click_commands:",
-      labelOnLeftShiftClick: "on_left_shift_click_commands:",
-      labelOnRightClick: "on_right_click_commands:",
-      labelOnRightShiftClick: "on_right_shift_click_commands:",
-      labelOnMiddleClick: "on_middle_click_commands:",
-      saveSlot: "Save slot",
-      clearSlots: "Clear all",
-      generateJSON: "Generate JSON",
-      resultTitle: "JSON output:",
-      downloadJSON: "Download JSON"
-    }
-  };
-
-  function updateLanguage(lang) {
-    const t = translations[lang] || translations.en;
-
-    document.getElementById("pageTitleH2").textContent = t.title;
-    menusLabel.textContent = t.labelMenusList;
-    newMenuBtn.textContent = t.newMenu;
-    saveMenuBtn.textContent = t.saveMenu;
-
-    document.getElementById("labelMenuName").textContent = t.labelMenuName;
-    document.getElementById("labelMenuTitle").textContent = t.labelMenuTitle;
-    document.getElementById("labelMenuLines").textContent = t.labelMenuLines;
-
-    document.getElementById("closeMenuLabelText").textContent = t.labelCloseMenu;
-
-    document.getElementById("labelOnOpenCommands").textContent = t.labelOnOpenCommands;
-    document.getElementById("labelOnClosedCommands").textContent = t.labelOnClosedCommands;
-
-    document.getElementById("slotsTitle").textContent = t.slotsTitle;
-    document.getElementById("slotEditorTitle").textContent = t.slotEditorTitle;
-
-    document.getElementById("labelItemSearch").textContent = t.labelItemSearch;
-    document.getElementById("labelDisplayName").textContent = t.labelDisplayName;
-    document.getElementById("labelItemCount").textContent = t.labelItemCount;
-    document.getElementById("labelItemLore").textContent = t.labelItemLore;
-
-    document.getElementById("hideTooltipLabelText").textContent = t.labelHideTooltip;
-    document.getElementById("glowLabelText").textContent = t.labelGlow;
-
-    document.getElementById("labelViewLevel").textContent = t.labelViewLevel;
-    document.getElementById("labelViewString").textContent = t.labelViewString;
-
-    document.getElementById("labelOnLeftClick").textContent = t.labelOnLeftClick;
-    document.getElementById("labelOnLeftShiftClick").textContent = t.labelOnLeftShiftClick;
-    document.getElementById("labelOnRightClick").textContent = t.labelOnRightClick;
-    document.getElementById("labelOnRightShiftClick").textContent = t.labelOnRightShiftClick;
-    document.getElementById("labelOnMiddleClick").textContent = t.labelOnMiddleClick;
-    
-
-    saveSlotBtn.textContent = t.saveSlot;
-    clearSlotsBtn.textContent = t.clearSlots;
-    generateJSONBtn.textContent = t.generateJSON;
-	downloadJSONBtn.textContent = t.downloadJSON;
-    document.getElementById("resultTitle").textContent = t.resultTitle;
-  }
-  const downloadJSONBtn = document.getElementById("downloadJSON");
 
   downloadJSONBtn.onclick = () => {
     const dataStr = JSON.stringify({ menus }, null, 2);
@@ -533,18 +411,48 @@
     const a = document.createElement("a");
     a.href = url;
     a.download = "menus.json";
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-
     URL.revokeObjectURL(url);
   };
-  // Автовыбор языка
-  const browserLang = (navigator.language || navigator.userLanguage).startsWith("ru") ? "ru" : "en";
-  langSelector.value = browserLang;
-  updateFlag();
-  updateLanguage(browserLang);
 
+  function updateLanguage(lang) {
+    if (lang === "en") {
+      document.getElementById("pageTitleH2").textContent = "Minecraft Menu Editor";
+      menusLabel.textContent = "Menus:";
+      newMenuBtn.textContent = "+ New Menu";
+      saveMenuBtn.textContent = "Save Menu";
+      document.getElementById("labelMenuName").textContent = "Menu Name:";
+      document.getElementById("labelMenuTitle").textContent = "Menu Title:";
+      document.getElementById("labelMenuLines").textContent = "Lines (1-6):";
+      document.getElementById("closeMenuLabelText").textContent = "Close on Click";
+      document.getElementById("labelOnOpenCommands").textContent = "On Open Commands:";
+      document.getElementById("labelOnClosedCommands").textContent = "On Closed Commands:";
+      document.getElementById("slotsTitle").textContent = "Slots:";
+      document.getElementById("slotEditorTitle").textContent = "Slot Editor";
+      document.getElementById("labelItemSearch").textContent = "Search Item:";
+      document.getElementById("labelDisplayName").textContent = "Display Name:";
+      document.getElementById("labelItemCount").textContent = "Item Count:";
+      document.getElementById("labelItemLore").textContent = "Lore:";
+      document.getElementById("hideTooltipLabelText").textContent = "Hide Tooltip";
+      document.getElementById("glowLabelText").textContent = "Glow";
+      document.getElementById("labelViewLevel").textContent = "View Requirement Level:";
+      document.getElementById("labelViewString").textContent = "View Requirement String:";
+      document.getElementById("labelOnLeftClick").textContent = "on_left_click_commands:";
+      document.getElementById("labelOnLeftShiftClick").textContent = "on_left_shift_click_commands:";
+      document.getElementById("labelOnRightClick").textContent = "on_right_click_commands:";
+      document.getElementById("labelOnRightShiftClick").textContent = "on_right_shift_click_commands:";
+      document.getElementById("labelOnMiddleClick").textContent = "on_middle_click_commands:";
+      saveSlotBtn.textContent = "Save Slot";
+      clearSlotsBtn.textContent = "Clear All";
+      generateJSONBtn.textContent = "Generate JSON";
+      downloadJSONBtn.textContent = "Download JSON";
+      document.getElementById("resultTitle").textContent = "JSON Result:";
+    } else {
+      location.reload();
+    }
+  }
+
+  renderGrid();
 </script>
 
 </body>
