@@ -104,7 +104,6 @@
 <label id="labelMenusList">Меню:</label>
 <select id="menusList"></select>
 <button id="newMenu">+ Новое меню</button>
-<button id="saveMenu">Сохранить меню</button>
 
 <label id="labelMenuName">Название меню:</label>
 <input type="text" id="menuName" placeholder="menu-name">
@@ -261,27 +260,6 @@
     }
   };
 
-  saveMenuBtn.onclick = () => {
-    if (!menuNameInput.value.trim()) return alert("Введите имя меню");
-    const slotsArray = Object.keys(slots).map(i => ({
-      index: parseInt(i),
-      ...slots[i]
-    }));
-    menus[menuNameInput.value.trim()] = {
-      title: menuTitleInput.value,
-      lines: parseInt(menuLinesInput.value) || 3,
-      close_menu_on_clicked: closeMenuCheckbox.checked,
-      commands: {
-        on_open_commands: onOpenCommandsInput.value.split("\n").filter(x => x),
-        on_closed_commands: onClosedCommandsInput.value.split("\n").filter(x => x)
-      },
-      slots: slotsArray
-    };
-    updateMenusList();
-    menusList.value = menuNameInput.value.trim();
-    alert("Сохранено меню: " + menuNameInput.value);
-  };
-
   menusList.onchange = () => {
     const name = menusList.value;
     if (!menus[name]) return;
@@ -396,6 +374,24 @@
     selectedSlot = null;
     loadSlot(null);
     renderGrid();
+        if (!menuNameInput.value.trim()) return alert("Введите имя меню");
+    const slotsArray = Object.keys(slots).map(i => ({
+      index: parseInt(i),
+      ...slots[i]
+    }));
+    menus[menuNameInput.value.trim()] = {
+      title: menuTitleInput.value,
+      lines: parseInt(menuLinesInput.value) || 3,
+      close_menu_on_clicked: closeMenuCheckbox.checked,
+      commands: {
+        on_open_commands: onOpenCommandsInput.value.split("\n").filter(x => x),
+        on_closed_commands: onClosedCommandsInput.value.split("\n").filter(x => x)
+      },
+      slots: slotsArray
+    };
+    updateMenusList();
+    menusList.value = menuNameInput.value.trim();
+    alert("Сохранено меню: " + menuNameInput.value);
   };
   clearSlotsBtn.onclick = () => { slots = {}; selectedSlot = null; renderGrid(); loadSlot(null); };
 
@@ -420,7 +416,6 @@
       document.getElementById("pageTitleH2").textContent = "Minecraft Menu Editor";
       menusLabel.textContent = "Menus:";
       newMenuBtn.textContent = "+ New Menu";
-      saveMenuBtn.textContent = "Save Menu";
       document.getElementById("labelMenuName").textContent = "Menu Name:";
       document.getElementById("labelMenuTitle").textContent = "Menu Title:";
       document.getElementById("labelMenuLines").textContent = "Lines (1-6):";
