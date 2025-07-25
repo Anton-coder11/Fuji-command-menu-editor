@@ -12,8 +12,53 @@
       max-width: 960px;
       margin: auto;
     }
+    /* Стили для селектора языка */
+    #langSelectorWrapper {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      background: linear-gradient(135deg, #3c6ef3 0%, #2b54c3 100%);
+      border-radius: 8px;
+      padding: 6px 12px 6px 40px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      z-index: 1000;
+    }
+    #langSelector {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      appearance: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      outline: none;
+    }
+    #langSelectorWrapper::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 14px;
+      background-size: cover;
+      border-radius: 2px;
+      pointer-events: none;
+      background-repeat: no-repeat;
+      background-position: center center;
+    }
+
     h2 {
       text-align: center;
+      margin-top: 60px; /* чтобы не перекрывался селектор */
     }
     label {
       display: block;
@@ -30,6 +75,7 @@
     }
     input[type="checkbox"] {
       margin-right: 6px;
+      vertical-align: middle;
     }
     button {
       margin: 5px 5px 0 0;
@@ -94,70 +140,80 @@
       background: #111;
       padding: 10px;
       overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
   </style>
 </head>
 <body>
 
-<h2>Редактор меню Minecraft</h2>
+<!-- Контейнер селектора языка -->
+<div id="langSelectorWrapper" aria-label="Language selector">
+  <select id="langSelector" title="Select language / Выберите язык" aria-live="polite" aria-atomic="true">
+    <option value="ru" data-flag="https://flagcdn.com/w20/ru.png">Русский</option>
+    <option value="en" data-flag="https://flagcdn.com/w20/gb.png">English</option>
+  </select>
+</div>
 
-<label>Название меню:</label>
+<h2 id="pageTitleH2">Редактор меню Minecraft</h2>
+
+<label id="labelMenuName">Название меню:</label>
 <input type="text" id="menuName" placeholder="menu-name">
 
-<label>Заголовок меню:</label>
+<label id="labelMenuTitle">Заголовок меню:</label>
 <input type="text" id="menuTitle" placeholder="Меню">
 
-<label>Линии (1–6):</label>
+<label id="labelMenuLines">Линии (1–6):</label>
 <input type="number" id="menuLines" min="1" max="6" value="3">
 
-<label><input type="checkbox" id="closeMenu"> Закрывать меню при клике</label>
+<label><input type="checkbox" id="closeMenu"><span id="closeMenuLabelText">Закрывать меню при клике</span></label>
 
-<label>Команды при открытии:</label>
+<label id="labelOnOpenCommands">Команды при открытии:</label>
 <textarea id="onOpenCommands"></textarea>
 
-<label>Команды при закрытии:</label>
+<label id="labelOnClosedCommands">Команды при закрытии:</label>
 <textarea id="onClosedCommands"></textarea>
 
-<h3>Слоты:</h3>
+<h3 id="slotsTitle">Слоты:</h3>
 <div id="slotsGrid"></div>
 
-<h3>Редактор слота</h3>
+<h3 id="slotEditorTitle">Редактор слота</h3>
 
-<label>Поиск предмета:</label>
+<label id="labelItemSearch">Поиск предмета:</label>
 <input type="text" id="itemSearch" autocomplete="off">
 <div id="itemList"></div>
 
-<label>Имя (display_name):</label>
+<label id="labelDisplayName">Имя (display_name):</label>
 <input type="text" id="displayName">
 
-<label>Количество:</label>
+<label id="labelItemCount">Количество:</label>
 <input type="number" id="itemCount" min="1" max="64" value="1">
 
-<label>Лор (по одной строке):</label>
+<label id="labelItemLore">Лор (по одной строке):</label>
 <textarea id="itemLore"></textarea>
 
-<label><input type="checkbox" id="hideTooltip"> Скрыть подсказку</label>
-<label><input type="checkbox" id="glow"> Подсвечивать</label>
+<label><input type="checkbox" id="hideTooltip"><span id="hideTooltipLabelText">Скрыть подсказку</span></label>
+<label><input type="checkbox" id="glow"><span id="glowLabelText">Подсвечивать</span></label>
 
-<label>View Requirement Level:</label>
+<label id="labelViewLevel">View Requirement Level:</label>
 <input type="number" id="viewLevel" min="0" value="0">
 
-<label>View Requirement String:</label>
+<label id="labelViewString">View Requirement String:</label>
 <input type="text" id="viewString">
 
-<label>on_left_click_commands:</label>
+<label id="labelOnLeftClick">on_left_click_commands:</label>
 <textarea id="onLeftClick"></textarea>
 
-<label>on_left_shift_click_commands:</label>
+<label id="labelOnLeftShiftClick">on_left_shift_click_commands:</label>
 <textarea id="onLeftShiftClick"></textarea>
 
-<label>on_right_click_commands:</label>
+<label id="labelOnRightClick">on_right_click_commands:</label>
 <textarea id="onRightClick"></textarea>
 
-<label>on_right_shift_click_commands:</label>
+<label id="labelOnRightShiftClick">on_right_shift_click_commands:</label>
 <textarea id="onRightShiftClick"></textarea>
 
-<label>on_middle_click_commands:</label>
+<label id="labelOnMiddleClick">on_middle_click_commands:</label>
 <textarea id="onMiddleClick"></textarea>
 
 <br/>
@@ -165,10 +221,32 @@
 <button id="clearSlots">Очистить всё</button>
 <button id="generateJSON">Сгенерировать JSON</button>
 
-<h3>Результат JSON:</h3>
+<h3 id="resultTitle">Результат JSON:</h3>
 <pre id="output"></pre>
 
 <script>
+  // --- Языковой селектор с отображением флага через псевдоэлемент ---
+  const langSelector = document.getElementById('langSelector');
+  const wrapper = document.getElementById('langSelectorWrapper');
+
+  function updateFlag() {
+    const opt = langSelector.options[langSelector.selectedIndex];
+    const url = opt.dataset.flag;
+    wrapper.style.setProperty('background-image', `url(${url})`);
+    wrapper.style.backgroundRepeat = "no-repeat";
+    wrapper.style.backgroundPosition = "12px center";
+    wrapper.style.paddingLeft = "40px";
+  }
+
+  langSelector.addEventListener('change', () => {
+    updateFlag();
+    updateLanguage(langSelector.value);
+  });
+
+  // Инициализация флага при загрузке страницы
+  updateFlag();
+
+  // === Переменные из твоего кода ===
   let allItems = [];
   fetch('itemsList.json').then(r => r.json()).then(data => allItems = data);
 
@@ -259,13 +337,13 @@
       itemLoreInput.value = s.lore.join("\n") || "";
       hideTooltipInput.checked = !!s.hide_tooltip;
       glowInput.checked = !!s.glow;
-      viewLevelInput.value = s.view_requirement.level || 0;
-      viewStringInput.value = s.view_requirement.string || "";
-      onLeftClickInput.value = s.commands.on_left_click_commands.join("\n");
-      onLeftShiftClickInput.value = s.commands.on_left_shift_click_commands.join("\n");
-      onRightClickInput.value = s.commands.on_right_click_commands.join("\n");
-      onRightShiftClickInput.value = s.commands.on_right_shift_click_commands.join("\n");
-      onMiddleClickInput.value = s.commands.on_middle_click_commands.join("\n");
+      viewLevelInput.value = s.view_requirement?.level || 0;
+      viewStringInput.value = s.view_requirement?.string || "";
+      onLeftClickInput.value = (s.commands?.on_left_click_commands || []).join("\n");
+      onLeftShiftClickInput.value = (s.commands?.on_left_shift_click_commands || []).join("\n");
+      onRightClickInput.value = (s.commands?.on_right_click_commands || []).join("\n");
+      onRightShiftClickInput.value = (s.commands?.on_right_shift_click_commands || []).join("\n");
+      onMiddleClickInput.value = (s.commands?.on_middle_click_commands || []).join("\n");
     } else {
       itemSearch.value = "";
       displayNameInput.value = "";
@@ -334,9 +412,108 @@
     }, null, 2);
   };
 
-  menuLinesInput.onchange = () => { renderGrid(); selectedSlot = null; loadSlot(null); };
+  menuLinesInput.onchange = () => { 
+    selectedSlot = null; 
+    loadSlot(null); 
+    renderGrid(); 
+  };
 
   renderGrid();
+
+  // --- Перевод интерфейса ---
+  const translations = {
+    ru: {
+      title: "Редактор меню Minecraft",
+      labelMenuName: "Название меню:",
+      labelMenuTitle: "Заголовок меню:",
+      labelMenuLines: "Линии (1–6):",
+      labelCloseMenu: "Закрывать меню при клике",
+      labelOnOpenCommands: "Команды при открытии:",
+      labelOnClosedCommands: "Команды при закрытии:",
+      slotsTitle: "Слоты:",
+      slotEditorTitle: "Редактор слота",
+      labelItemSearch: "Поиск предмета:",
+      labelDisplayName: "Имя (display_name):",
+      labelItemCount: "Количество:",
+      labelItemLore: "Лор (по одной строке):",
+      labelHideTooltip: "Скрыть подсказку",
+      labelGlow: "Подсвечивать",
+      labelViewLevel: "View Requirement Level:",
+      labelViewString: "View Requirement String:",
+      labelOnLeftClick: "on_left_click_commands:",
+      labelOnLeftShiftClick: "on_left_shift_click_commands:",
+      labelOnRightClick: "on_right_click_commands:",
+      labelOnRightShiftClick: "on_right_shift_click_commands:",
+      labelOnMiddleClick: "on_middle_click_commands:",
+      saveSlot: "Сохранить слот",
+      clearSlots: "Очистить всё",
+      generateJSON: "Сгенерировать JSON",
+      resultTitle: "Результат JSON:"
+    },
+    en: {
+      title: "Minecraft Menu Editor",
+      labelMenuName: "Menu name:",
+      labelMenuTitle: "Menu title:",
+      labelMenuLines: "Lines (1–6):",
+      labelCloseMenu: "Close menu on click",
+      labelOnOpenCommands: "Commands on open:",
+      labelOnClosedCommands: "Commands on close:",
+      slotsTitle: "Slots:",
+      slotEditorTitle: "Slot editor",
+      labelItemSearch: "Search item:",
+      labelDisplayName: "Name (display_name):",
+      labelItemCount: "Count:",
+      labelItemLore: "Lore (one line per entry):",
+      labelHideTooltip: "Hide tooltip",
+      labelGlow: "Glow",
+      labelViewLevel: "View Requirement Level:",
+      labelViewString: "View Requirement String:",
+      labelOnLeftClick: "on_left_click_commands:",
+      labelOnLeftShiftClick: "on_left_shift_click_commands:",
+      labelOnRightClick: "on_right_click_commands:",
+      labelOnRightShiftClick: "on_right_shift_click_commands:",
+      labelOnMiddleClick: "on_middle_click_commands:",
+      saveSlot: "Save Slot",
+      clearSlots: "Clear All",
+      generateJSON: "Generate JSON",
+      resultTitle: "JSON Result:"
+    }
+  };
+
+  function updateLanguage(lang) {
+    const t = translations[lang] || translations.en;
+    document.getElementById("pageTitleH2").textContent = t.title;
+    document.getElementById("labelMenuName").textContent = t.labelMenuName;
+    document.getElementById("labelMenuTitle").textContent = t.labelMenuTitle;
+    document.getElementById("labelMenuLines").textContent = t.labelMenuLines;
+    document.getElementById("closeMenuLabelText").textContent = t.labelCloseMenu;
+    document.getElementById("labelOnOpenCommands").textContent = t.labelOnOpenCommands;
+    document.getElementById("labelOnClosedCommands").textContent = t.labelOnClosedCommands;
+    document.getElementById("slotsTitle").textContent = t.slotsTitle;
+    document.getElementById("slotEditorTitle").textContent = t.slotEditorTitle;
+    document.getElementById("labelItemSearch").textContent = t.labelItemSearch;
+    document.getElementById("labelDisplayName").textContent = t.labelDisplayName;
+    document.getElementById("labelItemCount").textContent = t.labelItemCount;
+    document.getElementById("labelItemLore").textContent = t.labelItemLore;
+    document.getElementById("hideTooltipLabelText").textContent = t.labelHideTooltip;
+    document.getElementById("glowLabelText").textContent = t.labelGlow;
+    document.getElementById("labelViewLevel").textContent = t.labelViewLevel;
+    document.getElementById("labelViewString").textContent = t.labelViewString;
+    document.getElementById("labelOnLeftClick").textContent = t.labelOnLeftClick;
+    document.getElementById("labelOnLeftShiftClick").textContent = t.labelOnLeftShiftClick;
+    document.getElementById("labelOnRightClick").textContent = t.labelOnRightClick;
+    document.getElementById("labelOnRightShiftClick").textContent = t.labelOnRightShiftClick;
+    document.getElementById("labelOnMiddleClick").textContent = t.labelOnMiddleClick;
+    document.getElementById("saveSlot").textContent = t.saveSlot;
+    document.getElementById("clearSlots").textContent = t.clearSlots;
+    document.getElementById("generateJSON").textContent = t.generateJSON;
+    document.getElementById("resultTitle").textContent = t.resultTitle;
+  }
+
+  // Инициализация языка
+  const browserLang = (navigator.language || navigator.userLanguage).startsWith("ru") ? "ru" : "en";
+  langSelector.value = browserLang;
+  updateLanguage(browserLang);
 </script>
 
 </body>
