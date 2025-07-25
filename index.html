@@ -20,7 +20,6 @@
       border-radius: 8px;
       padding: 6px 12px 6px 40px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      font-family: Arial, sans-serif;
       display: flex;
       align-items: center;
       color: #fff;
@@ -28,6 +27,8 @@
       user-select: none;
       font-weight: 600;
       z-index: 1000;
+      background-repeat: no-repeat;
+      background-position: 12px center;
     }
     #langSelector {
       background: transparent;
@@ -35,8 +36,6 @@
       color: #fff;
       font-size: 14px;
       appearance: none;
-      padding: 0;
-      margin: 0;
       cursor: pointer;
       outline: none;
     }
@@ -92,361 +91,352 @@
 </head>
 <body>
 
-<div id="langSelectorWrapper" aria-label="Language selector">
+<div id="langSelectorWrapper">
   <select id="langSelector" title="Select language / Выберите язык" aria-live="polite" aria-atomic="true">
     <option value="ru" data-flag="https://flagcdn.com/w20/ru.png">Русский</option>
     <option value="en" data-flag="https://flagcdn.com/w20/gb.png">English</option>
   </select>
 </div>
 
-<h2 id="pageTitleH2">Редактор меню Minecraft</h2>
+<h2 id="pageTitleH2"></h2>
 
-<label id="labelMenusList">Меню:</label>
+<label id="labelMenusList"></label>
 <select id="menusList"></select>
-<button id="newMenu">+ Новое меню</button>
+<button id="newMenu"></button>
+<input type="file" id="loadJSONInput" accept=".json" style="display:none" />
+<button id="loadJSONBtn" title="Загрузить JSON файл меню"></button>
 
-<label id="labelMenuName">Название меню:</label>
+<label id="labelMenuName"></label>
 <input type="text" id="menuName" placeholder="menu-name">
 
-<label id="labelMenuTitle">Заголовок меню:</label>
+<label id="labelMenuTitle"></label>
 <input type="text" id="menuTitle" placeholder="Меню">
 
-<label id="labelMenuLines">Линии (1–6):</label>
+<label id="labelMenuLines"></label>
 <input type="number" id="menuLines" min="1" max="6" value="3">
 
-<label><input type="checkbox" id="closeMenu"><span id="closeMenuLabelText">Закрывать меню при клике</span></label>
+<label><input type="checkbox" id="closeMenu"><span id="closeMenuLabelText"></span></label>
 
-<label id="labelOnOpenCommands">Команды при открытии:</label>
+<label id="labelOnOpenCommands"></label>
 <textarea id="onOpenCommands"></textarea>
 
-<label id="labelOnClosedCommands">Команды при закрытии:</label>
+<label id="labelOnClosedCommands"></label>
 <textarea id="onClosedCommands"></textarea>
 
-<h3 id="slotsTitle">Слоты:</h3>
+<h3 id="slotsTitle"></h3>
 <div id="slotsGrid"></div>
 
-<h3 id="slotEditorTitle">Редактор слота</h3>
+<h3 id="slotEditorTitle"></h3>
 
-<label id="labelItemSearch">Поиск предмета:</label>
+<label id="labelItemSearch"></label>
 <input type="text" id="itemSearch" autocomplete="off">
 <div id="itemList"></div>
 
-<label id="labelDisplayName">Имя (display_name):</label>
+<label id="labelDisplayName"></label>
 <input type="text" id="displayName">
 
-<label id="labelItemCount">Количество:</label>
+<label id="labelItemCount"></label>
 <input type="number" id="itemCount" min="1" max="64" value="1">
 
-<label id="labelItemLore">Лор (по одной строке):</label>
+<label id="labelItemLore"></label>
 <textarea id="itemLore"></textarea>
 
-<label><input type="checkbox" id="hideTooltip"><span id="hideTooltipLabelText">Скрыть подсказку</span></label>
-<label><input type="checkbox" id="glow"><span id="glowLabelText">Подсвечивать</span></label>
+<label><input type="checkbox" id="hideTooltip"><span id="hideTooltipLabelText"></span></label>
+<label><input type="checkbox" id="glow"><span id="glowLabelText"></span></label>
 
-<label id="labelViewLevel">View Requirement Level:</label>
+<label id="labelViewLevel"></label>
 <input type="number" id="viewLevel" min="0" value="0">
 
-<label id="labelViewString">View Requirement String:</label>
+<label id="labelViewString"></label>
 <input type="text" id="viewString">
 
-<label id="labelOnLeftClick">on_left_click_commands:</label>
+<label id="labelOnLeftClick"></label>
 <textarea id="onLeftClick"></textarea>
 
-<label id="labelOnLeftShiftClick">on_left_shift_click_commands:</label>
+<label id="labelOnLeftShiftClick"></label>
 <textarea id="onLeftShiftClick"></textarea>
 
-<label id="labelOnRightClick">on_right_click_commands:</label>
+<label id="labelOnRightClick"></label>
 <textarea id="onRightClick"></textarea>
 
-<label id="labelOnRightShiftClick">on_right_shift_click_commands:</label>
+<label id="labelOnRightShiftClick"></label>
 <textarea id="onRightShiftClick"></textarea>
 
-<label id="labelOnMiddleClick">on_middle_click_commands:</label>
+<label id="labelOnMiddleClick"></label>
 <textarea id="onMiddleClick"></textarea>
 
 <br/>
-<button id="saveSlot">Сохранить слот</button>
-<button id="clearSlots">Очистить всё</button>
-<button id="generateJSON">Сгенерировать JSON</button>
-<button id="downloadJSON">Скачать JSON</button>
+<button id="saveSlot"></button>
+<button id="clearSlots"></button>
+<button id="generateJSON"></button>
+<button id="downloadJSON"></button>
 
-<h3 id="resultTitle">Результат JSON:</h3>
+<h3 id="resultTitle"></h3>
 <pre id="output"></pre>
 
 <script>
-  const langSelector = document.getElementById('langSelector');
-  const wrapper = document.getElementById('langSelectorWrapper');
+  // DOM
+  const langSelector   = document.getElementById('langSelector');
+  const wrapper        = document.getElementById('langSelectorWrapper');
+  const menusList      = document.getElementById('menusList');
+  const newMenuBtn     = document.getElementById('newMenu');
+  const loadJSONInput  = document.getElementById('loadJSONInput');
+  const loadJSONBtn    = document.getElementById('loadJSONBtn');
 
+  const menuNameInput      = document.getElementById("menuName");
+  const menuTitleInput     = document.getElementById("menuTitle");
+  const menuLinesInput     = document.getElementById("menuLines");
+  const closeMenuCheckbox  = document.getElementById("closeMenu");
+  const onOpenCommandsInput  = document.getElementById("onOpenCommands");
+  const onClosedCommandsInput= document.getElementById("onClosedCommands");
+
+  const slotsGrid         = document.getElementById("slotsGrid");
+  const itemSearch        = document.getElementById("itemSearch");
+  const itemList          = document.getElementById("itemList");
+  const displayNameInput  = document.getElementById("displayName");
+  const itemCountInput    = document.getElementById("itemCount");
+  const itemLoreInput     = document.getElementById("itemLore");
+  const hideTooltipInput  = document.getElementById("hideTooltip");
+  const glowInput         = document.getElementById("glow");
+  const viewLevelInput    = document.getElementById("viewLevel");
+  const viewStringInput   = document.getElementById("viewString");
+  const onLeftClickInput     = document.getElementById("onLeftClick");
+  const onLeftShiftClickInput= document.getElementById("onLeftShiftClick");
+  const onRightClickInput    = document.getElementById("onRightClick");
+  const onRightShiftClickInput= document.getElementById("onRightShiftClick");
+  const onMiddleClickInput   = document.getElementById("onMiddleClick");
+
+  const saveSlotBtn     = document.getElementById("saveSlot");
+  const clearSlotsBtn   = document.getElementById("clearSlots");
+  const generateJSONBtn = document.getElementById("generateJSON");
+  const downloadJSONBtn = document.getElementById("downloadJSON");
+  const outputPre       = document.getElementById("output");
+
+  // Data
+  let allItems     = [];
+  let slots        = {};
+  let selectedSlot = null;
+  let menus        = {};
+
+  // Load items list
+  fetch('itemsList.json').then(r=>r.json()).then(data=> allItems = data);
+
+  // Flag update
   function updateFlag() {
     const opt = langSelector.options[langSelector.selectedIndex];
-    const url = opt.dataset.flag;
-    wrapper.style.setProperty('background-image', `url(${url})`);
-    wrapper.style.backgroundRepeat = "no-repeat";
-    wrapper.style.backgroundPosition = "12px center";
-    wrapper.style.paddingLeft = "40px";
+    wrapper.style.backgroundImage = `url(${opt.dataset.flag})`;
   }
-  langSelector.addEventListener('change', () => {
+  langSelector.addEventListener('change', ()=>{
     updateFlag();
-    updateLanguage(langSelector.value);
+    loadTranslations(langSelector.value);
   });
   updateFlag();
 
-  let allItems = [];
-  fetch('itemsList.json').then(r => r.json()).then(data => allItems = data);
+  // Load translation file and apply
+  function loadTranslations(lang) {
+    const file = lang === 'en' ? 'lang/en_UK.json' : 'lang/ru_RU.json';
+    fetch(file).then(r=>r.json()).then(tr => {
+      Object.entries(tr).forEach(([id, text])=>{
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+      });
+    });
+  }
+  loadTranslations(langSelector.value);
 
-  const slotsGrid = document.getElementById("slotsGrid");
-  const menuNameInput = document.getElementById("menuName");
-  const menuTitleInput = document.getElementById("menuTitle");
-  const menuLinesInput = document.getElementById("menuLines");
-  const closeMenuCheckbox = document.getElementById("closeMenu");
-  const onOpenCommandsInput = document.getElementById("onOpenCommands");
-  const onClosedCommandsInput = document.getElementById("onClosedCommands");
-
-  const itemSearch = document.getElementById("itemSearch");
-  const itemList = document.getElementById("itemList");
-  const displayNameInput = document.getElementById("displayName");
-  const itemCountInput = document.getElementById("itemCount");
-  const itemLoreInput = document.getElementById("itemLore");
-  const hideTooltipInput = document.getElementById("hideTooltip");
-  const glowInput = document.getElementById("glow");
-  const viewLevelInput = document.getElementById("viewLevel");
-  const viewStringInput = document.getElementById("viewString");
-  const onLeftClickInput = document.getElementById("onLeftClick");
-  const onLeftShiftClickInput = document.getElementById("onLeftShiftClick");
-  const onRightClickInput = document.getElementById("onRightClick");
-  const onRightShiftClickInput = document.getElementById("onRightShiftClick");
-  const onMiddleClickInput = document.getElementById("onMiddleClick");
-
-  const outputPre = document.getElementById("output");
-  const saveSlotBtn = document.getElementById("saveSlot");
-  const clearSlotsBtn = document.getElementById("clearSlots");
-  const generateJSONBtn = document.getElementById("generateJSON");
-  const downloadJSONBtn = document.getElementById("downloadJSON");
-
-  const saveMenuBtn = document.getElementById("saveMenu");
-  const newMenuBtn = document.getElementById("newMenu");
-  const menusLabel = document.getElementById("labelMenusList");
-  const menusList = document.getElementById("menusList");
-
-  let slots = {};
-  let selectedSlot = null;
-  let menus = {};
-
-  function updateMenusList() {
-    menusList.innerHTML = "";
-    Object.keys(menus).forEach(name => {
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      menusList.append(opt);
+  // Update menus list
+  function updateMenusList(){
+    menusList.innerHTML = '';
+    Object.keys(menus).forEach(name=>{
+      const o = document.createElement('option');
+      o.value = name; o.textContent = name;
+      menusList.append(o);
     });
   }
 
+  // New menu
   newMenuBtn.onclick = () => {
-    const name = prompt("Введите имя нового меню:");
-    if (name && !menus[name]) {
-      slots = {};
-      selectedSlot = null;
-      menuNameInput.value = name;
-      menuTitleInput.value = "";
-      menuLinesInput.value = 3;
-      closeMenuCheckbox.checked = false;
-      onOpenCommandsInput.value = "";
-      onClosedCommandsInput.value = "";
-      menus[name] = { slots: [] };
-      updateMenusList();
-      menusList.value = name;
-      renderGrid();
-    }
+    const promptText = langSelector.value==='en' ? 'New menu name:' : 'Введите имя нового меню:';
+    const name = prompt(promptText);
+    if(!name || menus[name]) return;
+    slots = {}; selectedSlot = null;
+    menuNameInput.value = name;
+    menuTitleInput.value = '';
+    menuLinesInput.value = 3;
+    closeMenuCheckbox.checked = false;
+    onOpenCommandsInput.value = '';
+    onClosedCommandsInput.value = '';
+    menus[name] = { title:'', lines:3, close_menu_on_clicked:false, commands:{}, slots:[] };
+    updateMenusList();
+    menusList.value = name;
+    renderGrid();
   };
 
+  // Load JSON menus
+  loadJSONBtn.onclick = ()=> loadJSONInput.click();
+  loadJSONInput.onchange = e=> {
+    const f = e.target.files[0]; if(!f) return;
+    const rdr = new FileReader();
+    rdr.onload = evt => {
+      try {
+        const data = JSON.parse(evt.target.result);
+        if (!data.menus) throw Error('Нет объекта menus');
+        menus = data.menus;
+        updateMenusList();
+        menusList.selectedIndex = 0;
+        menusList.onchange();
+      } catch(err){
+        alert((langSelector.value==='en'?'Error loading JSON: ':'Ошибка загрузки JSON: ')+err.message);
+      }
+    };
+    rdr.readAsText(f);
+    e.target.value = '';
+  };
+
+  // Select menu
   menusList.onchange = () => {
-    const name = menusList.value;
-    if (!menus[name]) return;
+    const name = menusList.value; if(!menus[name]) return;
     const m = menus[name];
     menuNameInput.value = name;
-    menuTitleInput.value = m.title || "";
-    menuLinesInput.value = m.lines || 3;
+    menuTitleInput.value = m.title||'';
+    menuLinesInput.value = m.lines||3;
     closeMenuCheckbox.checked = !!m.close_menu_on_clicked;
-    onOpenCommandsInput.value = (m.commands?.on_open_commands || []).join("\n");
-    onClosedCommandsInput.value = (m.commands?.on_closed_commands || []).join("\n");
-    slots = {};
-    (m.slots || []).forEach(s => slots[s.index] = s);
-    selectedSlot = null;
-    renderGrid();
-    loadSlot(null);
+    onOpenCommandsInput.value   = (m.commands?.on_open_commands||[]).join('\n');
+    onClosedCommandsInput.value = (m.commands?.on_closed_commands||[]).join('\n');
+    slots = {}; selectedSlot = null;
+    (m.slots||[]).forEach(s=> slots[s.index] = s );
+    renderGrid(); loadSlot(null);
   };
 
-  itemSearch.addEventListener("input", () => {
-    const val = itemSearch.value.trim().toLowerCase();
-    if (!val) { itemList.innerHTML = ''; return; }
-    let perfect = allItems.filter(i => i.toLowerCase() === val);
-    let partial = allItems.filter(i => i.toLowerCase().includes(val) && i.toLowerCase() !== val);
-    let results = [...perfect, ...partial].slice(0, 20);
-    itemList.innerHTML = results.map(item => `
+  // Item autocomplete
+  itemSearch.addEventListener('input', ()=>{
+    const v = itemSearch.value.trim().toLowerCase();
+    if(!v){ itemList.innerHTML = ''; return; }
+    const perf = allItems.filter(i=>i.toLowerCase()===v);
+    const part = allItems.filter(i=>i.toLowerCase().includes(v)&&i.toLowerCase()!==v);
+    const res = [...perf,...part].slice(0,20);
+    itemList.innerHTML = res.map(item=>`
       <div data-item="${item}">
-        <img src="icons/${item}.png" onerror="this.style.display='none'">
-        ${item}
+        <img src="icons/${item}.png" onerror="this.style.display='none'">${item}
       </div>
     `).join('');
-    Array.from(itemList.children).forEach(div => {
-      div.onclick = () => {
-        itemSearch.value = div.dataset.item;
-        itemList.innerHTML = '';
-      };
+    Array.from(itemList.children).forEach(div=>{
+      div.onclick=()=>{ itemSearch.value = div.dataset.item; itemList.innerHTML = ''; };
     });
   });
-  document.addEventListener('click', e => {
-    if (!itemSearch.contains(e.target) && !itemList.contains(e.target)) {
+  document.addEventListener('click', e=>{
+    if(!itemSearch.contains(e.target)&&!itemList.contains(e.target))
       itemList.innerHTML = '';
-    }
   });
 
-  function renderGrid() {
-    slotsGrid.innerHTML = "";
-    const lines = parseInt(menuLinesInput.value) || 3;
-    const total = lines * 9;
-    for (let i = 0; i < total; i++) {
-      const div = document.createElement("div");
-      div.className = "slot";
-      if (slots[i]) {
-        div.innerHTML = `<img src="icons/${slots[i].item}.png" onerror="this.parentNode.textContent='${slots[i].item}';">`;
-      } else {
-        div.textContent = i;
-      }
-      if (i === selectedSlot) div.classList.add("selected");
-      div.onclick = () => { selectedSlot = i; loadSlot(i); renderGrid(); };
-      slotsGrid.append(div);
+  // Render grid
+  function renderGrid(){
+    slotsGrid.innerHTML = '';
+    const lines = parseInt(menuLinesInput.value)||3;
+    const total = lines*9;
+    for(let i=0;i<total;i++){
+      const d = document.createElement('div');
+      d.className = 'slot';
+      if(slots[i]){
+        d.innerHTML = `<img src="icons/${slots[i].item}.png" onerror="this.textContent='${slots[i].item}'">`;
+      } else d.textContent = i;
+      if(i===selectedSlot) d.classList.add('selected');
+      d.onclick = ()=>{ selectedSlot = i; loadSlot(i); renderGrid(); };
+      slotsGrid.append(d);
     }
   }
 
-  function loadSlot(i) {
+  // Load slot form
+  function loadSlot(i){
     const s = slots[i];
-    if (s) {
-      itemSearch.value = s.item || "";
-      displayNameInput.value = s.display_name || "";
-      itemCountInput.value = s.count || 1;
-      itemLoreInput.value = s.lore.join("\n") || "";
+    if(s){
+      itemSearch.value = s.item||'';
+      displayNameInput.value = s.display_name||'';
+      itemCountInput.value = s.count||1;
+      itemLoreInput.value = (s.lore||[]).join('\n');
       hideTooltipInput.checked = !!s.hide_tooltip;
       glowInput.checked = !!s.glow;
-      viewLevelInput.value = s.view_requirement?.level || 0;
-      viewStringInput.value = s.view_requirement?.string || "";
-      onLeftClickInput.value = (s.commands?.on_left_click_commands || []).join("\n");
-      onLeftShiftClickInput.value = (s.commands?.on_left_shift_click_commands || []).join("\n");
-      onRightClickInput.value = (s.commands?.on_right_click_commands || []).join("\n");
-      onRightShiftClickInput.value = (s.commands?.on_right_shift_click_commands || []).join("\n");
-      onMiddleClickInput.value = (s.commands?.on_middle_click_commands || []).join("\n");
+      viewLevelInput.value = s.view_requirement?.level||0;
+      viewStringInput.value = s.view_requirement?.string||'';
+      onLeftClickInput.value      = (s.commands?.on_left_click_commands||[]).join('\n');
+      onLeftShiftClickInput.value = (s.commands?.on_left_shift_click_commands||[]).join('\n');
+      onRightClickInput.value     = (s.commands?.on_right_click_commands||[]).join('\n');
+      onRightShiftClickInput.value= (s.commands?.on_right_shift_click_commands||[]).join('\n');
+      onMiddleClickInput.value    = (s.commands?.on_middle_click_commands||[]).join('\n');
     } else {
-      itemSearch.value = "";
-      displayNameInput.value = "";
-      itemCountInput.value = 1;
-      itemLoreInput.value = "";
-      hideTooltipInput.checked = false;
-      glowInput.checked = false;
-      viewLevelInput.value = 0;
-      viewStringInput.value = "";
-      onLeftClickInput.value = "";
-      onLeftShiftClickInput.value = "";
-      onRightClickInput.value = "";
-      onRightShiftClickInput.value = "";
-      onMiddleClickInput.value = "";
+      [itemSearch,displayNameInput,itemLoreInput,
+       onLeftClickInput,onLeftShiftClickInput,
+       onRightClickInput,onRightShiftClickInput,onMiddleClickInput
+      ].forEach(el=> el.value='');
+      itemCountInput.value=1;
+      hideTooltipInput.checked=false;
+      glowInput.checked=false;
+      viewLevelInput.value=0;
+      viewStringInput.value='';
     }
   }
 
-  saveSlotBtn.onclick = () => {
-    if (selectedSlot === null) return;
+  // Save slot + update menus
+  saveSlotBtn.onclick = ()=>{
+    if(selectedSlot===null) return;
     slots[selectedSlot] = {
       item: itemSearch.value.trim(),
-      count: parseInt(itemCountInput.value) || 1,
+      count: parseInt(itemCountInput.value)||1,
       display_name: displayNameInput.value.trim(),
-      lore: itemLoreInput.value.split("\n").filter(x => x),
+      lore: itemLoreInput.value.split('\n').filter(x=>x),
       hide_tooltip: hideTooltipInput.checked,
       glow: glowInput.checked,
-      view_requirement: { level: parseInt(viewLevelInput.value) || 0, string: viewStringInput.value.trim() },
-      commands: {
-        on_left_click_commands: onLeftClickInput.value.split("\n").filter(x => x),
-        on_left_shift_click_commands: onLeftShiftClickInput.value.split("\n").filter(x => x),
-        on_right_click_commands: onRightClickInput.value.split("\n").filter(x => x),
-        on_right_shift_click_commands: onRightShiftClickInput.value.split("\n").filter(x => x),
-        on_middle_click_commands: onMiddleClickInput.value.split("\n").filter(x => x)
+      view_requirement:{
+        level: parseInt(viewLevelInput.value)||0,
+        string: viewStringInput.value.trim()
+      },
+      commands:{
+        on_left_click_commands: onLeftClickInput.value.split('\n').filter(x=>x),
+        on_left_shift_click_commands: onLeftShiftClickInput.value.split('\n').filter(x=>x),
+        on_right_click_commands: onRightClickInput.value.split('\n').filter(x=>x),
+        on_right_shift_click_commands: onRightShiftClickInput.value.split('\n').filter(x=>x),
+        on_middle_click_commands: onMiddleClickInput.value.split('\n').filter(x=>x)
       }
     };
-    selectedSlot = null;
-    loadSlot(null);
-    renderGrid();
-        if (!menuNameInput.value.trim()) return alert("Введите имя меню");
-    const slotsArray = Object.keys(slots).map(i => ({
-      index: parseInt(i),
-      ...slots[i]
-    }));
-    menus[menuNameInput.value.trim()] = {
+    selectedSlot=null; loadSlot(null); renderGrid();
+
+    const name = menuNameInput.value.trim();
+    if(!name){ alert(langSelector.value==='en'?'Enter menu name':'Введите имя меню'); return; }
+    const arr = Object.keys(slots).map(i=>({ index:parseInt(i), ...slots[i] }));
+    menus[name] = {
       title: menuTitleInput.value,
-      lines: parseInt(menuLinesInput.value) || 3,
+      lines: parseInt(menuLinesInput.value)||3,
       close_menu_on_clicked: closeMenuCheckbox.checked,
-      commands: {
-        on_open_commands: onOpenCommandsInput.value.split("\n").filter(x => x),
-        on_closed_commands: onClosedCommandsInput.value.split("\n").filter(x => x)
+      commands:{
+        on_open_commands: onOpenCommandsInput.value.split('\n').filter(x=>x),
+        on_closed_commands: onClosedCommandsInput.value.split('\n').filter(x=>x)
       },
-      slots: slotsArray
+      slots: arr
     };
-    updateMenusList();
-    menusList.value = menuNameInput.value.trim();
-    alert("Сохранено меню: " + menuNameInput.value);
-  };
-  clearSlotsBtn.onclick = () => { slots = {}; selectedSlot = null; renderGrid(); loadSlot(null); };
-
-  generateJSONBtn.onclick = () => {
-    outputPre.textContent = JSON.stringify({ menus }, null, 2);
+    updateMenusList(); menusList.value=name;
+    alert(langSelector.value==='en'?'Menu saved.':'Сохранено меню: '+name);
   };
 
-  downloadJSONBtn.onclick = () => {
-    const dataStr = JSON.stringify({ menus }, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+  // Clear slots
+  clearSlotsBtn.onclick = ()=>{
+    slots = {}; selectedSlot=null; renderGrid(); loadSlot(null);
+  };
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "menus.json";
-    a.click();
+  // Show JSON
+  generateJSONBtn.onclick = ()=>{
+    outputPre.textContent = JSON.stringify({menus},null,2);
+  };
+
+  // Download JSON
+  downloadJSONBtn.onclick = ()=>{
+    const blob = new Blob([ JSON.stringify({menus},null,2) ],{type:'application/json'});
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download='menus.json'; a.click();
     URL.revokeObjectURL(url);
   };
 
-  function updateLanguage(lang) {
-    if (lang === "en") {
-      document.getElementById("pageTitleH2").textContent = "Minecraft Menu Editor";
-      menusLabel.textContent = "Menus:";
-      newMenuBtn.textContent = "+ New Menu";
-      document.getElementById("labelMenuName").textContent = "Menu Name:";
-      document.getElementById("labelMenuTitle").textContent = "Menu Title:";
-      document.getElementById("labelMenuLines").textContent = "Lines (1-6):";
-      document.getElementById("closeMenuLabelText").textContent = "Close on Click";
-      document.getElementById("labelOnOpenCommands").textContent = "On Open Commands:";
-      document.getElementById("labelOnClosedCommands").textContent = "On Closed Commands:";
-      document.getElementById("slotsTitle").textContent = "Slots:";
-      document.getElementById("slotEditorTitle").textContent = "Slot Editor";
-      document.getElementById("labelItemSearch").textContent = "Search Item:";
-      document.getElementById("labelDisplayName").textContent = "Display Name:";
-      document.getElementById("labelItemCount").textContent = "Item Count:";
-      document.getElementById("labelItemLore").textContent = "Lore:";
-      document.getElementById("hideTooltipLabelText").textContent = "Hide Tooltip";
-      document.getElementById("glowLabelText").textContent = "Glow";
-      document.getElementById("labelViewLevel").textContent = "View Requirement Level:";
-      document.getElementById("labelViewString").textContent = "View Requirement String:";
-      document.getElementById("labelOnLeftClick").textContent = "on_left_click_commands:";
-      document.getElementById("labelOnLeftShiftClick").textContent = "on_left_shift_click_commands:";
-      document.getElementById("labelOnRightClick").textContent = "on_right_click_commands:";
-      document.getElementById("labelOnRightShiftClick").textContent = "on_right_shift_click_commands:";
-      document.getElementById("labelOnMiddleClick").textContent = "on_middle_click_commands:";
-      saveSlotBtn.textContent = "Save Slot";
-      clearSlotsBtn.textContent = "Clear All";
-      generateJSONBtn.textContent = "Generate JSON";
-      downloadJSONBtn.textContent = "Download JSON";
-      document.getElementById("resultTitle").textContent = "JSON Result:";
-    } else {
-      location.reload();
-    }
-  }
-
+  // Start
   renderGrid();
 </script>
 
