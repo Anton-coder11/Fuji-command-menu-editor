@@ -1,176 +1,177 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<title>Редактор меню Minecraft</title>
-<style>
-  body {
-    background: #1e1e2f;
-    color: #eee;
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    max-width: 960px;
-    margin: auto;
-  }
-  h2 {
-    text-align: center;
-  }
-  label {
-    display: block;
-    margin: 8px 0 4px;
-  }
-  input[type="text"], input[type="number"], textarea, select {
-    width: 100%;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    background: #2e2e44;
-    color: #eee;
-    box-sizing: border-box;
-  }
-  input[type="checkbox"] {
-    margin-right: 6px;
-  }
-  button {
-    margin: 5px 5px 0 0;
-    padding: 10px 20px;
-    background: #3c6ef3;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  button:hover {
-    background: #2b54c3;
-  }
-  #slotsGrid {
-    display: grid;
-    grid-template-columns: repeat(9, 50px);
-    gap: 6px;
-    margin: 20px 0;
-  }
-  .slot {
-    background: #2a2a40;
-    border-radius: 4px;
-    width: 50px;
-    height: 50px;
-    color: #aaa;
-    font-size: 9px;
-    text-align: center;
-    line-height: 50px;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-  }
-  .slot.selected {
-    outline: 3px solid #3c6ef3;
-  }
-  .slot img {
-    max-width: 100%;
-    max-height: 100%;
-    display: block;
-  }
-  #itemList {
-    background: #2a2a40;
-    max-height: 120px;
-    overflow-y: auto;
-  }
-  #itemList div {
-    padding: 4px 8px;
-    cursor: pointer;
-  }
-  #itemList div:hover {
-    background: #3c6ef3;
-  }
-  pre {
-    background: #111;
-    padding: 10px;
-    overflow-x: auto;
-  }
-  #langSelector {
-    width: auto;
-    margin-bottom: 20px;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Редактор меню Minecraft</title>
+  <style>
+    body {
+      background: #1e1e2f;
+      color: #eee;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 960px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin: 8px 0 4px;
+    }
+    input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      background: #2e2e44;
+      color: #eee;
+      box-sizing: border-box;
+    }
+    input[type="checkbox"] {
+      margin-right: 6px;
+    }
+    button {
+      margin: 5px 5px 0 0;
+      padding: 10px 20px;
+      background: #3c6ef3;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2b54c3;
+    }
+    #slotsGrid {
+      display: grid;
+      grid-template-columns: repeat(9, 50px);
+      gap: 6px;
+      margin: 20px 0;
+    }
+    .slot {
+      background: #2a2a40;
+      border-radius: 4px;
+      width: 50px;
+      height: 50px;
+      color: #aaa;
+      font-size: 9px;
+      text-align: center;
+      line-height: 50px;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+    }
+    .slot.selected {
+      outline: 3px solid #3c6ef3;
+    }
+    .slot img {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+    #itemList {
+      background: #2a2a40;
+      max-height: 160px;
+      overflow-y: auto;
+      position: relative;
+    }
+    #itemList div {
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    #itemList div:hover {
+      background: #3c6ef3;
+    }
+    #itemList img {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    pre {
+      background: #111;
+      padding: 10px;
+      overflow-x: auto;
+    }
+  </style>
 </head>
 <body>
 
-<select id="langSelector" title="Select language / Выберите язык">
-  <option value="ru">Русский</option>
-  <option value="en">English</option>
-</select>
+<h2>Редактор меню Minecraft</h2>
 
-<h2 id="pageTitle">Редактор меню Minecraft</h2>
-
-<label id="labelMenuName">Название меню:</label>
+<label>Название меню:</label>
 <input type="text" id="menuName" placeholder="menu-name">
 
-<label id="labelMenuTitle">Заголовок меню:</label>
+<label>Заголовок меню:</label>
 <input type="text" id="menuTitle" placeholder="Меню">
 
-<label id="labelMenuLines">Линии (1–6):</label>
+<label>Линии (1–6):</label>
 <input type="number" id="menuLines" min="1" max="6" value="3">
 
-<label><input type="checkbox" id="closeMenu"> <span id="labelCloseMenu">Закрывать меню при клике</span></label>
+<label><input type="checkbox" id="closeMenu"> Закрывать меню при клике</label>
 
-<label id="labelOnOpenCommands">Команды при открытии:</label>
+<label>Команды при открытии:</label>
 <textarea id="onOpenCommands"></textarea>
 
-<label id="labelOnClosedCommands">Команды при закрытии:</label>
+<label>Команды при закрытии:</label>
 <textarea id="onClosedCommands"></textarea>
 
-<h3 id="slotsTitle">Слоты:</h3>
+<h3>Слоты:</h3>
 <div id="slotsGrid"></div>
 
-<h3 id="slotEditorTitle">Редактор слота</h3>
+<h3>Редактор слота</h3>
 
-<label id="labelItemSearch">Поиск предмета:</label>
+<label>Поиск предмета:</label>
 <input type="text" id="itemSearch" autocomplete="off">
 <div id="itemList"></div>
 
-<label id="labelDisplayName">Имя (display_name):</label>
+<label>Имя (display_name):</label>
 <input type="text" id="displayName">
 
-<label id="labelItemCount">Количество:</label>
+<label>Количество:</label>
 <input type="number" id="itemCount" min="1" max="64" value="1">
 
-<label id="labelItemLore">Лор (по одной строке):</label>
+<label>Лор (по одной строке):</label>
 <textarea id="itemLore"></textarea>
 
-<label><input type="checkbox" id="hideTooltip"> <span id="labelHideTooltip">Скрыть подсказку</span></label>
-<label><input type="checkbox" id="glow"> <span id="labelGlow">Подсвечивать</span></label>
+<label><input type="checkbox" id="hideTooltip"> Скрыть подсказку</label>
+<label><input type="checkbox" id="glow"> Подсвечивать</label>
 
-<label id="labelViewLevel">View Requirement Level:</label>
+<label>View Requirement Level:</label>
 <input type="number" id="viewLevel" min="0" value="0">
 
-<label id="labelViewString">View Requirement String:</label>
+<label>View Requirement String:</label>
 <input type="text" id="viewString">
 
-<label id="labelOnLeftClick">on_left_click_commands:</label>
+<label>on_left_click_commands:</label>
 <textarea id="onLeftClick"></textarea>
 
-<label id="labelOnLeftShiftClick">on_left_shift_click_commands:</label>
+<label>on_left_shift_click_commands:</label>
 <textarea id="onLeftShiftClick"></textarea>
 
-<label id="labelOnRightClick">on_right_click_commands:</label>
+<label>on_right_click_commands:</label>
 <textarea id="onRightClick"></textarea>
 
-<label id="labelOnRightShiftClick">on_right_shift_click_commands:</label>
+<label>on_right_shift_click_commands:</label>
 <textarea id="onRightShiftClick"></textarea>
 
-<label id="labelOnMiddleClick">on_middle_click_commands:</label>
+<label>on_middle_click_commands:</label>
 <textarea id="onMiddleClick"></textarea>
 
 <br/>
 <button id="saveSlot">Сохранить слот</button>
 <button id="clearSlots">Очистить всё</button>
 <button id="generateJSON">Сгенерировать JSON</button>
-<button id="downloadJSON">Скачать JSON</button>
 
 <h3>Результат JSON:</h3>
 <pre id="output"></pre>
 
 <script>
+  let allItems = [];
+  fetch('itemsList.json').then(r => r.json()).then(data => allItems = data);
+
   const slotsGrid = document.getElementById("slotsGrid");
   const menuNameInput = document.getElementById("menuName");
   const menuTitleInput = document.getElementById("menuTitle");
@@ -198,127 +199,38 @@
   const saveSlotBtn = document.getElementById("saveSlot");
   const clearSlotsBtn = document.getElementById("clearSlots");
   const generateJSONBtn = document.getElementById("generateJSON");
-  const downloadJSONBtn = document.getElementById("downloadJSON");
-
-  const langSelector = document.getElementById("langSelector");
-
-  const translations = {
-    ru: {
-      title: "Редактор меню Minecraft",
-      labelMenuName: "Название меню:",
-      labelMenuTitle: "Заголовок меню:",
-      labelMenuLines: "Линии (1–6):",
-      labelCloseMenu: "Закрывать меню при клике",
-      labelOnOpenCommands: "Команды при открытии:",
-      labelOnClosedCommands: "Команды при закрытии:",
-      slotsTitle: "Слоты:",
-      slotEditorTitle: "Редактор слота",
-      labelItemSearch: "Поиск предмета:",
-      labelDisplayName: "Имя (display_name):",
-      labelItemCount: "Количество:",
-      labelItemLore: "Лор (по одной строке):",
-      labelHideTooltip: "Скрыть подсказку",
-      labelGlow: "Подсвечивать",
-      labelViewLevel: "View Requirement Level:",
-      labelViewString: "View Requirement String:",
-      labelOnLeftClick: "on_left_click_commands:",
-      labelOnLeftShiftClick: "on_left_shift_click_commands:",
-      labelOnRightClick: "on_right_click_commands:",
-      labelOnRightShiftClick: "on_right_shift_click_commands:",
-      labelOnMiddleClick: "on_middle_click_commands:",
-      saveSlotBtn: "Сохранить слот",
-      clearSlotsBtn: "Очистить всё",
-      generateJSONBtn: "Сгенерировать JSON",
-      downloadJSONBtn: "Скачать JSON",
-      alertGenerateFirst: "Сначала сгенерируйте JSON!"
-    },
-    en: {
-      title: "Minecraft Menu Editor",
-      labelMenuName: "Menu name:",
-      labelMenuTitle: "Menu title:",
-      labelMenuLines: "Lines (1–6):",
-      labelCloseMenu: "Close menu on click",
-      labelOnOpenCommands: "Commands on open:",
-      labelOnClosedCommands: "Commands on close:",
-      slotsTitle: "Slots:",
-      slotEditorTitle: "Slot editor",
-      labelItemSearch: "Search item:",
-      labelDisplayName: "Name (display_name):",
-      labelItemCount: "Count:",
-      labelItemLore: "Lore (one line per entry):",
-      labelHideTooltip: "Hide tooltip",
-      labelGlow: "Glow",
-      labelViewLevel: "View Requirement Level:",
-      labelViewString: "View Requirement String:",
-      labelOnLeftClick: "on_left_click_commands:",
-      labelOnLeftShiftClick: "on_left_shift_click_commands:",
-      labelOnRightClick: "on_right_click_commands:",
-      labelOnRightShiftClick: "on_right_shift_click_commands:",
-      labelOnMiddleClick: "on_middle_click_commands:",
-      saveSlotBtn: "Save Slot",
-      clearSlotsBtn: "Clear All",
-      generateJSONBtn: "Generate JSON",
-      downloadJSONBtn: "Download JSON",
-      alertGenerateFirst: "Please generate JSON first!"
-    }
-  };
-
-  function updateLanguage(lang) {
-    const t = translations[lang] || translations["en"];
-    document.getElementById("pageTitle").textContent = t.title;
-    document.getElementById("labelMenuName").textContent = t.labelMenuName;
-    document.getElementById("labelMenuTitle").textContent = t.labelMenuTitle;
-    document.getElementById("labelMenuLines").textContent = t.labelMenuLines;
-    document.getElementById("labelCloseMenu").textContent = t.labelCloseMenu;
-    document.getElementById("labelOnOpenCommands").textContent = t.labelOnOpenCommands;
-    document.getElementById("labelOnClosedCommands").textContent = t.labelOnClosedCommands;
-    document.getElementById("slotsTitle").textContent = t.slotsTitle;
-    document.getElementById("slotEditorTitle").textContent = t.slotEditorTitle;
-    document.getElementById("labelItemSearch").textContent = t.labelItemSearch;
-    document.getElementById("labelDisplayName").textContent = t.labelDisplayName;
-    document.getElementById("labelItemCount").textContent = t.labelItemCount;
-    document.getElementById("labelItemLore").textContent = t.labelItemLore;
-    document.getElementById("labelHideTooltip").textContent = t.labelHideTooltip;
-    document.getElementById("labelGlow").textContent = t.labelGlow;
-    document.getElementById("labelViewLevel").textContent = t.labelViewLevel;
-    document.getElementById("labelViewString").textContent = t.labelViewString;
-    document.getElementById("labelOnLeftClick").textContent = t.labelOnLeftClick;
-    document.getElementById("labelOnLeftShiftClick").textContent = t.labelOnLeftShiftClick;
-    document.getElementById("labelOnRightClick").textContent = t.labelOnRightClick;
-    document.getElementById("labelOnRightShiftClick").textContent = t.labelOnRightShiftClick;
-    document.getElementById("labelOnMiddleClick").textContent = t.labelOnMiddleClick;
-    saveSlotBtn.textContent = t.saveSlotBtn;
-    clearSlotsBtn.textContent = t.clearSlotsBtn;
-    generateJSONBtn.textContent = t.generateJSONBtn;
-    downloadJSONBtn.textContent = t.downloadJSONBtn;
-  }
-
-  langSelector.onchange = () => {
-    updateLanguage(langSelector.value);
-  };
-
-  // Автоматический выбор языка по браузеру
-  const userLang = navigator.language || navigator.userLanguage;
-  if (userLang && userLang.toLowerCase().startsWith("ru")) {
-    langSelector.value = "ru";
-  } else {
-    langSelector.value = "en";
-  }
-  updateLanguage(langSelector.value);
-
-  // --- Оставшийся код ---
-
-  // Функция для формирования URL иконки (Wiki, стандартный шаблон)
-  function getIconURL(itemName) {
-    const cleanName = itemName.replace("minecraft:", "");
-    const parts = cleanName.split("_").map(
-      p => p.charAt(0).toUpperCase() + p.slice(1)
-    );
-    return `https://minecraft.wiki/images/${parts.join("_")}_JE2_BE2.png`;
-  }
 
   let slots = {};
   let selectedSlot = null;
+
+  itemSearch.addEventListener("input", () => {
+    const val = itemSearch.value.trim().toLowerCase();
+    if (!val) { itemList.innerHTML = ''; return; }
+
+    let perfect = allItems.filter(i => i.toLowerCase() === val);
+    let partial = allItems.filter(i => i.toLowerCase().includes(val) && i.toLowerCase() !== val);
+    let results = [...perfect, ...partial].slice(0, 20);
+
+    itemList.innerHTML = results.map(item => `
+      <div data-item="${item}">
+        <img src="icons/${item}.png" onerror="this.style.display='none'">
+        ${item}
+      </div>
+    `).join('');
+
+    Array.from(itemList.children).forEach(div => {
+      div.onclick = () => {
+        itemSearch.value = div.dataset.item;
+        itemList.innerHTML = '';
+      };
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!itemSearch.contains(e.target) && !itemList.contains(e.target)) {
+      itemList.innerHTML = '';
+    }
+  });
 
   function renderGrid() {
     slotsGrid.innerHTML = "";
@@ -328,17 +240,12 @@
       const div = document.createElement("div");
       div.className = "slot";
       if (slots[i]) {
-        const iconUrl = slots[i].icon || getIconURL(slots[i].item);
-        div.innerHTML = `<img src="${iconUrl}" onerror="this.onerror=null;this.parentNode.textContent='${slots[i].item.split(':')[1]}';">`;
+        div.innerHTML = `<img src="icons/${slots[i].item}.png" onerror="this.parentNode.textContent='${slots[i].item}';">`;
       } else {
         div.textContent = i;
       }
       if (i === selectedSlot) div.classList.add("selected");
-      div.onclick = () => {
-        selectedSlot = i;
-        loadSlot(i);
-        renderGrid();
-      };
+      div.onclick = () => { selectedSlot = i; loadSlot(i); renderGrid(); };
       slotsGrid.append(div);
     }
   }
@@ -346,7 +253,7 @@
   function loadSlot(i) {
     const s = slots[i];
     if (s) {
-      itemSearch.value = s.item;
+      itemSearch.value = s.item || "";
       displayNameInput.value = s.display_name || "";
       itemCountInput.value = s.count || 1;
       itemLoreInput.value = s.lore.join("\n") || "";
@@ -376,51 +283,27 @@
     }
   }
 
-  // Добавляем minecraft: если отсутствует
-  itemSearch.addEventListener("blur", () => {
-    let v = itemSearch.value.trim();
-    if (v && !v.includes(":")) {
-      v = "minecraft:" + v.toLowerCase();
-    }
-    itemSearch.value = v;
-  });
-
-  // Проверка существует ли иконка, колбек realURL или null
-  function checkIconExists(itemName, callback) {
-    const url = getIconURL(itemName);
-    const img = new Image();
-    img.onload = () => callback(url);
-    img.onerror = () => callback(null);
-    img.src = url;
-  }
-
   saveSlotBtn.onclick = () => {
     if (selectedSlot === null) return;
-    let itemName = itemSearch.value.trim();
-    if (!itemName.includes(":")) itemName = "minecraft:" + itemName.toLowerCase();
-
-    checkIconExists(itemName, function(realURL) {
-      slots[selectedSlot] = {
-        item: itemName,
-        icon: realURL, // Сохраняем ссылку если есть, иначе null
-        count: parseInt(itemCountInput.value) || 1,
-        display_name: displayNameInput.value.trim(),
-        lore: itemLoreInput.value.split("\n").filter(x => x),
-        hide_tooltip: hideTooltipInput.checked,
-        glow: glowInput.checked,
-        view_requirement: { level: parseInt(viewLevelInput.value) || 0, string: viewStringInput.value.trim() },
-        commands: {
-          on_left_click_commands: onLeftClickInput.value.split("\n").filter(x => x),
-          on_left_shift_click_commands: onLeftShiftClickInput.value.split("\n").filter(x => x),
-          on_right_click_commands: onRightClickInput.value.split("\n").filter(x => x),
-          on_right_shift_click_commands: onRightShiftClickInput.value.split("\n").filter(x => x),
-          on_middle_click_commands: onMiddleClickInput.value.split("\n").filter(x => x)
-        }
-      };
-      selectedSlot = null;
-      loadSlot(null);
-      renderGrid();
-    });
+    slots[selectedSlot] = {
+      item: itemSearch.value.trim(),
+      count: parseInt(itemCountInput.value) || 1,
+      display_name: displayNameInput.value.trim(),
+      lore: itemLoreInput.value.split("\n").filter(x => x),
+      hide_tooltip: hideTooltipInput.checked,
+      glow: glowInput.checked,
+      view_requirement: { level: parseInt(viewLevelInput.value) || 0, string: viewStringInput.value.trim() },
+      commands: {
+        on_left_click_commands: onLeftClickInput.value.split("\n").filter(x => x),
+        on_left_shift_click_commands: onLeftShiftClickInput.value.split("\n").filter(x => x),
+        on_right_click_commands: onRightClickInput.value.split("\n").filter(x => x),
+        on_right_shift_click_commands: onRightShiftClickInput.value.split("\n").filter(x => x),
+        on_middle_click_commands: onMiddleClickInput.value.split("\n").filter(x => x)
+      }
+    };
+    selectedSlot = null;
+    loadSlot(null);
+    renderGrid();
   };
 
   clearSlotsBtn.onclick = () => { slots = {}; selectedSlot = null; renderGrid(); loadSlot(null); };
@@ -432,13 +315,10 @@
     for (let i = 0; i < total; i++) {
       if (slots[i]) {
         const s = JSON.parse(JSON.stringify(slots[i]));
-        // icon не нужен в JSON, уберём
-        delete s.icon;
-        const slotObj = { index: i, ...s };
-        arr.push(slotObj);
+        arr.push({ index: i, ...s });
       }
     }
-    const res = {
+    outputPre.textContent = JSON.stringify({
       menus: {
         [menuNameInput.value]: {
           title: menuTitleInput.value,
@@ -451,33 +331,10 @@
           slots: arr
         }
       }
-    };
-    outputPre.textContent = JSON.stringify(res, null, 2);
+    }, null, 2);
   };
 
-  downloadJSONBtn.onclick = () => {
-    const dataStr = outputPre.textContent;
-    if (!dataStr) {
-      alert(translations[langSelector.value].alertGenerateFirst);
-      return;
-    }
-    const blob = new Blob([dataStr], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    const filename = menuNameInput.value.trim() || "menus";
-    a.download = filename + ".json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  menuLinesInput.onchange = () => {
-    renderGrid();
-    selectedSlot = null;
-    loadSlot(null);
-  };
+  menuLinesInput.onchange = () => { renderGrid(); selectedSlot = null; loadSlot(null); };
 
   renderGrid();
 </script>
