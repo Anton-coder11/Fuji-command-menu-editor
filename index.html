@@ -12,7 +12,6 @@
       max-width: 960px;
       margin: auto;
     }
-    /* Стили для селектора языка */
     #langSelectorWrapper {
       position: fixed;
       top: 15px;
@@ -55,99 +54,45 @@
       background-repeat: no-repeat;
       background-position: center center;
     }
-
-    h2 {
-      text-align: center;
-      margin-top: 60px; /* чтобы не перекрывался селектор */
-    }
-    label {
-      display: block;
-      margin: 8px 0 4px;
-    }
+    h2 { text-align: center; margin-top: 60px; }
+    label { display: block; margin: 8px 0 4px; }
     input[type="text"], input[type="number"], textarea {
-      width: 100%;
-      padding: 6px 10px;
-      border: none;
-      border-radius: 4px;
-      background: #2e2e44;
-      color: #eee;
-      box-sizing: border-box;
+      width: 100%; padding: 6px 10px; border: none; border-radius: 4px;
+      background: #2e2e44; color: #eee; box-sizing: border-box;
     }
-    input[type="checkbox"] {
-      margin-right: 6px;
-      vertical-align: middle;
-    }
+    input[type="checkbox"] { margin-right: 6px; vertical-align: middle; }
     button {
-      margin: 5px 5px 0 0;
-      padding: 10px 20px;
-      background: #3c6ef3;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      margin: 5px 5px 0 0; padding: 10px 20px; background: #3c6ef3;
+      color: #fff; border: none; border-radius: 4px; cursor: pointer;
     }
-    button:hover {
-      background: #2b54c3;
-    }
+    button:hover { background: #2b54c3; }
     #slotsGrid {
-      display: grid;
-      grid-template-columns: repeat(9, 50px);
-      gap: 6px;
-      margin: 20px 0;
+      display: grid; grid-template-columns: repeat(9, 50px); gap: 6px; margin: 20px 0;
     }
     .slot {
-      background: #2a2a40;
-      border-radius: 4px;
-      width: 50px;
-      height: 50px;
-      color: #aaa;
-      font-size: 9px;
-      text-align: center;
-      line-height: 50px;
-      cursor: pointer;
-      overflow: hidden;
-      position: relative;
+      background: #2a2a40; border-radius: 4px; width: 50px; height: 50px;
+      color: #aaa; font-size: 9px; text-align: center; line-height: 50px;
+      cursor: pointer; overflow: hidden; position: relative;
     }
-    .slot.selected {
-      outline: 3px solid #3c6ef3;
-    }
-    .slot img {
-      max-width: 100%;
-      max-height: 100%;
-      display: block;
-    }
+    .slot.selected { outline: 3px solid #3c6ef3; }
+    .slot img { max-width: 100%; max-height: 100%; display: block; }
     #itemList {
-      background: #2a2a40;
-      max-height: 160px;
-      overflow-y: auto;
-      position: relative;
+      background: #2a2a40; max-height: 160px; overflow-y: auto; position: relative;
     }
     #itemList div {
-      display: flex;
-      align-items: center;
-      padding: 4px 8px;
-      cursor: pointer;
+      display: flex; align-items: center; padding: 4px 8px; cursor: pointer;
     }
-    #itemList div:hover {
-      background: #3c6ef3;
-    }
-    #itemList img {
-      width: 24px;
-      height: 24px;
-      margin-right: 8px;
-    }
+    #itemList div:hover { background: #3c6ef3; }
+    #itemList img { width: 24px; height: 24px; margin-right: 8px; }
     pre {
-      background: #111;
-      padding: 10px;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-wrap: break-word;
+      background: #111; padding: 10px; overflow-x: auto;
+      white-space: pre-wrap; word-wrap: break-word;
     }
   </style>
 </head>
 <body>
 
-<!-- Контейнер селектора языка -->
+<!-- Флаг -->
 <div id="langSelectorWrapper" aria-label="Language selector">
   <select id="langSelector" title="Select language / Выберите язык" aria-live="polite" aria-atomic="true">
     <option value="ru" data-flag="https://flagcdn.com/w20/ru.png">Русский</option>
@@ -156,6 +101,11 @@
 </div>
 
 <h2 id="pageTitleH2">Редактор меню Minecraft</h2>
+
+<label id="labelMenusList">Меню:</label>
+<select id="menusList"></select>
+<button id="newMenu">+ Новое меню</button>
+<button id="saveMenu">Сохранить меню</button>
 
 <label id="labelMenuName">Название меню:</label>
 <input type="text" id="menuName" placeholder="menu-name">
@@ -220,12 +170,16 @@
 <button id="saveSlot">Сохранить слот</button>
 <button id="clearSlots">Очистить всё</button>
 <button id="generateJSON">Сгенерировать JSON</button>
+<button id="downloadJSON">Скачать JSON</button>
 
 <h3 id="resultTitle">Результат JSON:</h3>
 <pre id="output"></pre>
 
+<!-- Скрипт -->
 <script>
-  // --- Языковой селектор с отображением флага через псевдоэлемент ---
+  // -------------------
+  // 1) Флаг + Перевод
+  // -------------------
   const langSelector = document.getElementById('langSelector');
   const wrapper = document.getElementById('langSelectorWrapper');
 
@@ -237,16 +191,15 @@
     wrapper.style.backgroundPosition = "12px center";
     wrapper.style.paddingLeft = "40px";
   }
-
   langSelector.addEventListener('change', () => {
     updateFlag();
     updateLanguage(langSelector.value);
   });
-
-  // Инициализация флага при загрузке страницы
   updateFlag();
 
-  // === Переменные из твоего кода ===
+  // -----------------------
+  // 2) Меню + Слоты
+  // -----------------------
   let allItems = [];
   fetch('itemsList.json').then(r => r.json()).then(data => allItems = data);
 
@@ -278,24 +231,90 @@
   const clearSlotsBtn = document.getElementById("clearSlots");
   const generateJSONBtn = document.getElementById("generateJSON");
 
+  // Новое: кнопки и селект меню
+  const saveMenuBtn = document.getElementById("saveMenu");
+  const newMenuBtn = document.getElementById("newMenu");
+  const menusLabel = document.getElementById("labelMenusList");
+  const menusList = document.getElementById("menusList");
+
   let slots = {};
   let selectedSlot = null;
+  let menus = {};
 
+  function updateMenusList() {
+    menusList.innerHTML = "";
+    Object.keys(menus).forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      menusList.append(opt);
+    });
+  }
+
+  newMenuBtn.onclick = () => {
+    const name = prompt("Введите имя нового меню:");
+    if (name && !menus[name]) {
+      slots = {};
+      selectedSlot = null;
+      menuNameInput.value = name;
+      menuTitleInput.value = "";
+      menuLinesInput.value = 3;
+      closeMenuCheckbox.checked = false;
+      onOpenCommandsInput.value = "";
+      onClosedCommandsInput.value = "";
+      menus[name] = { slots: {} };
+      updateMenusList();
+      menusList.value = name;
+      renderGrid();
+    }
+  };
+
+  saveMenuBtn.onclick = () => {
+    if (!menuNameInput.value.trim()) return alert("Введите имя меню");
+    menus[menuNameInput.value.trim()] = {
+      title: menuTitleInput.value,
+      lines: parseInt(menuLinesInput.value) || 3,
+      close_menu_on_clicked: closeMenuCheckbox.checked,
+      commands: {
+        on_open_commands: onOpenCommandsInput.value.split("\n").filter(x => x),
+        on_closed_commands: onClosedCommandsInput.value.split("\n").filter(x => x)
+      },
+      slots: slots
+    };
+    updateMenusList();
+    menusList.value = menuNameInput.value.trim();
+    alert("Сохранено меню: " + menuNameInput.value);
+  };
+
+  menusList.onchange = () => {
+    const name = menusList.value;
+    if (!menus[name]) return;
+    const m = menus[name];
+    menuNameInput.value = name;
+    menuTitleInput.value = m.title || "";
+    menuLinesInput.value = m.lines || 3;
+    closeMenuCheckbox.checked = !!m.close_menu_on_clicked;
+    onOpenCommandsInput.value = (m.commands?.on_open_commands || []).join("\n");
+    onClosedCommandsInput.value = (m.commands?.on_closed_commands || []).join("\n");
+    slots = m.slots || {};
+    selectedSlot = null;
+    renderGrid();
+    loadSlot(null);
+  };
+
+  // Автоподстановка предметов
   itemSearch.addEventListener("input", () => {
     const val = itemSearch.value.trim().toLowerCase();
     if (!val) { itemList.innerHTML = ''; return; }
-
     let perfect = allItems.filter(i => i.toLowerCase() === val);
     let partial = allItems.filter(i => i.toLowerCase().includes(val) && i.toLowerCase() !== val);
     let results = [...perfect, ...partial].slice(0, 20);
-
     itemList.innerHTML = results.map(item => `
       <div data-item="${item}">
         <img src="icons/${item}.png" onerror="this.style.display='none'">
         ${item}
       </div>
     `).join('');
-
     Array.from(itemList.children).forEach(div => {
       div.onclick = () => {
         itemSearch.value = div.dataset.item;
@@ -303,8 +322,7 @@
       };
     });
   });
-
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', e => {
     if (!itemSearch.contains(e.target) && !itemList.contains(e.target)) {
       itemList.innerHTML = '';
     }
@@ -383,47 +401,23 @@
     loadSlot(null);
     renderGrid();
   };
-
   clearSlotsBtn.onclick = () => { slots = {}; selectedSlot = null; renderGrid(); loadSlot(null); };
 
   generateJSONBtn.onclick = () => {
-    const lines = parseInt(menuLinesInput.value) || 3;
-    const total = lines * 9;
-    const arr = [];
-    for (let i = 0; i < total; i++) {
-      if (slots[i]) {
-        const s = JSON.parse(JSON.stringify(slots[i]));
-        arr.push({ index: i, ...s });
-      }
-    }
-    outputPre.textContent = JSON.stringify({
-      menus: {
-        [menuNameInput.value]: {
-          title: menuTitleInput.value,
-          lines: lines,
-          close_menu_on_clicked: closeMenuCheckbox.checked,
-          commands: {
-            on_open_commands: onOpenCommandsInput.value.split("\n").filter(x => x),
-            on_closed_commands: onClosedCommandsInput.value.split("\n").filter(x => x)
-          },
-          slots: arr
-        }
-      }
-    }, null, 2);
+    outputPre.textContent = JSON.stringify({ menus }, null, 2);
   };
-
-  menuLinesInput.onchange = () => { 
-    selectedSlot = null; 
-    loadSlot(null); 
-    renderGrid(); 
-  };
-
+  menuLinesInput.onchange = () => { selectedSlot = null; loadSlot(null); renderGrid(); };
   renderGrid();
 
-  // --- Перевод интерфейса ---
+  // ---------------------------
+  // Перевод с новыми кнопками
+  // ---------------------------
   const translations = {
     ru: {
       title: "Редактор меню Minecraft",
+      labelMenusList: "Меню:",
+      newMenu: "+ Новое меню",
+      saveMenu: "Сохранить меню",
       labelMenuName: "Название меню:",
       labelMenuTitle: "Заголовок меню:",
       labelMenuLines: "Линии (1–6):",
@@ -448,10 +442,14 @@
       saveSlot: "Сохранить слот",
       clearSlots: "Очистить всё",
       generateJSON: "Сгенерировать JSON",
-      resultTitle: "Результат JSON:"
+      resultTitle: "Результат JSON:",
+      downloadJSON: "Скачать JSON"
     },
     en: {
       title: "Minecraft Menu Editor",
+      labelMenusList: "Menus:",
+      newMenu: "+ New menu",
+      saveMenu: "Save menu",
       labelMenuName: "Menu name:",
       labelMenuTitle: "Menu title:",
       labelMenuLines: "Lines (1–6):",
@@ -460,10 +458,10 @@
       labelOnClosedCommands: "Commands on close:",
       slotsTitle: "Slots:",
       slotEditorTitle: "Slot editor",
-      labelItemSearch: "Search item:",
-      labelDisplayName: "Name (display_name):",
+      labelItemSearch: "Item search:",
+      labelDisplayName: "Display name:",
       labelItemCount: "Count:",
-      labelItemLore: "Lore (one line per entry):",
+      labelItemLore: "Lore (one line each):",
       labelHideTooltip: "Hide tooltip",
       labelGlow: "Glow",
       labelViewLevel: "View Requirement Level:",
@@ -473,47 +471,80 @@
       labelOnRightClick: "on_right_click_commands:",
       labelOnRightShiftClick: "on_right_shift_click_commands:",
       labelOnMiddleClick: "on_middle_click_commands:",
-      saveSlot: "Save Slot",
-      clearSlots: "Clear All",
+      saveSlot: "Save slot",
+      clearSlots: "Clear all",
       generateJSON: "Generate JSON",
-      resultTitle: "JSON Result:"
+      resultTitle: "JSON output:",
+      downloadJSON: "Download JSON"
     }
   };
 
   function updateLanguage(lang) {
     const t = translations[lang] || translations.en;
+
     document.getElementById("pageTitleH2").textContent = t.title;
+    menusLabel.textContent = t.labelMenusList;
+    newMenuBtn.textContent = t.newMenu;
+    saveMenuBtn.textContent = t.saveMenu;
+
     document.getElementById("labelMenuName").textContent = t.labelMenuName;
     document.getElementById("labelMenuTitle").textContent = t.labelMenuTitle;
     document.getElementById("labelMenuLines").textContent = t.labelMenuLines;
+
     document.getElementById("closeMenuLabelText").textContent = t.labelCloseMenu;
+
     document.getElementById("labelOnOpenCommands").textContent = t.labelOnOpenCommands;
     document.getElementById("labelOnClosedCommands").textContent = t.labelOnClosedCommands;
+
     document.getElementById("slotsTitle").textContent = t.slotsTitle;
     document.getElementById("slotEditorTitle").textContent = t.slotEditorTitle;
+
     document.getElementById("labelItemSearch").textContent = t.labelItemSearch;
     document.getElementById("labelDisplayName").textContent = t.labelDisplayName;
     document.getElementById("labelItemCount").textContent = t.labelItemCount;
     document.getElementById("labelItemLore").textContent = t.labelItemLore;
+
     document.getElementById("hideTooltipLabelText").textContent = t.labelHideTooltip;
     document.getElementById("glowLabelText").textContent = t.labelGlow;
+
     document.getElementById("labelViewLevel").textContent = t.labelViewLevel;
     document.getElementById("labelViewString").textContent = t.labelViewString;
+
     document.getElementById("labelOnLeftClick").textContent = t.labelOnLeftClick;
     document.getElementById("labelOnLeftShiftClick").textContent = t.labelOnLeftShiftClick;
     document.getElementById("labelOnRightClick").textContent = t.labelOnRightClick;
     document.getElementById("labelOnRightShiftClick").textContent = t.labelOnRightShiftClick;
     document.getElementById("labelOnMiddleClick").textContent = t.labelOnMiddleClick;
-    document.getElementById("saveSlot").textContent = t.saveSlot;
-    document.getElementById("clearSlots").textContent = t.clearSlots;
-    document.getElementById("generateJSON").textContent = t.generateJSON;
+    
+
+    saveSlotBtn.textContent = t.saveSlot;
+    clearSlotsBtn.textContent = t.clearSlots;
+    generateJSONBtn.textContent = t.generateJSON;
+	downloadJSONBtn.textContent = t.downloadJSON;
     document.getElementById("resultTitle").textContent = t.resultTitle;
   }
+  const downloadJSONBtn = document.getElementById("downloadJSON");
 
-  // Инициализация языка
+  downloadJSONBtn.onclick = () => {
+    const dataStr = JSON.stringify({ menus }, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "menus.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+  };
+  // Автовыбор языка
   const browserLang = (navigator.language || navigator.userLanguage).startsWith("ru") ? "ru" : "en";
   langSelector.value = browserLang;
+  updateFlag();
   updateLanguage(browserLang);
+
 </script>
 
 </body>
